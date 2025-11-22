@@ -11,12 +11,14 @@ const MOVE_SPEED = 4.5
 const LOOK_SENSITIVITY = 0.0035
 const CAMERA_HEIGHT = 1.3
 const MAX_PITCH = Math.PI / 2 - 0.05
+const JUMP_IMPULSE = 4.5
 
-const keyState: Record<'forward' | 'backward' | 'left' | 'right', boolean> = {
+const keyState: Record<'forward' | 'backward' | 'left' | 'right' | 'jump', boolean> = {
   forward: false,
   backward: false,
   left: false,
   right: false,
+  jump: false,
 }
 
 /**
@@ -28,6 +30,8 @@ export function PlayerController({ invertY = false }: PlayerControllerProps): Re
   const yaw = useRef(0)
   const pitch = useRef(0)
   const { camera, gl } = useThree()
+  const contactCount = useRef(0)
+  const jumpRequested = useRef(false)
 
   const yawEuler = useMemo(() => new Euler(0, 0, 0, 'YXZ'), [])
   const cameraEuler = useMemo(() => new Euler(0, 0, 0, 'YXZ'), [])
@@ -51,6 +55,10 @@ export function PlayerController({ invertY = false }: PlayerControllerProps): Re
         case 'KeyD':
           keyState.right = true
           break
+        case 'Space':
+          keyState.jump = true
+          jumpRequested.current = true
+          break
         default:
           break
       }
@@ -69,6 +77,9 @@ export function PlayerController({ invertY = false }: PlayerControllerProps): Re
           break
         case 'KeyD':
           keyState.right = false
+          break
+        case 'Space':
+          keyState.jump = false
           break
         default:
           break
@@ -147,11 +158,22 @@ export function PlayerController({ invertY = false }: PlayerControllerProps): Re
 
     // Prevent unwanted spin from collisions.
     body.setAngvel({ x: 0, y: 0, z: 0 }, true)
+
+    if (jumpRequested.current && contactCount.current > 0 && Math.abs(currentVelocity.y) < 0.2) {
+      body.applyImpulse({ x: 0, y: JUMP_IMPULSE, z: 0 }, true)
+    }
+    jumpRequested.current = false
   })
 
   return (
     <RigidBody
       ref={bodyRef}
+      onCollisionEnter={() => {
+        contactCount.current += 1
+      }}
+      onCollisionExit={() => {
+        contactCount.current = Math.max(0, contactCount.current - 1)
+      }}
       colliders={false}
       canSleep={false}
       enabledRotations={[false, false, false]}
