@@ -1,12 +1,16 @@
 import { Suspense, type ReactElement } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
 import { Physics, RigidBody } from '@react-three/rapier'
+import { PlayerController } from '../controls/PlayerController.tsx'
+
+type PlaygroundSceneProps = {
+  invertMouseY?: boolean
+}
 
 /**
  * Simple placeholder scene to verify React Three Fiber and Rapier are wired up.
  */
-export function PlaygroundScene(): ReactElement {
+export function PlaygroundScene({ invertMouseY = false }: PlaygroundSceneProps): ReactElement {
   return (
     <Canvas shadows camera={{ position: [7, 6, 10], fov: 50 }}>
       <color attach="background" args={['#0b1021']} />
@@ -20,10 +24,10 @@ export function PlaygroundScene(): ReactElement {
           shadow-mapSize={[1024, 1024]}
         />
         <Physics gravity={[0, -9.81, 0]}>
+          <PlayerController invertY={invertMouseY} />
           <FloatingCrate />
           <Ground />
         </Physics>
-        <OrbitControls enablePan={false} maxDistance={28} minDistance={6} />
       </Suspense>
     </Canvas>
   )

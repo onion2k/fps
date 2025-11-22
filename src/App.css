@@ -42,6 +42,30 @@
   color: #cbd5e1;
 }
 
+.toggle-row {
+  margin-top: 10px;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: #e2e8f0;
+}
+
+.toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: #22d3ee;
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
 .viewport {
   flex: 1;
 }
