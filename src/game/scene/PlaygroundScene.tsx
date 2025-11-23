@@ -1,8 +1,25 @@
-import { Suspense, type ReactElement } from 'react'
+import { Suspense, useMemo, type ComponentType, type ReactElement } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Physics, RigidBody } from '@react-three/rapier'
 import { Stats } from '@react-three/drei'
 import { PlayerController } from '../controls/PlayerController.tsx'
+import type { Vector3Tuple } from 'three'
+
+type NatureModelProps = JSX.IntrinsicElements['group']
+
+type NatureModule = {
+  Model?: ComponentType<NatureModelProps>
+}
+
+const natureModules = import.meta.glob<NatureModule>('../../assets/nature/*', { eager: true })
+
+const NATURE_MODELS: ComponentType<NatureModelProps>[] = Object.values(natureModules)
+  .map((module) => module.Model)
+  .filter((Model): Model is ComponentType<NatureModelProps> => typeof Model === 'function')
+
+const GRID_COLUMNS = 8
+const GRID_SPACING = 4
+const GRID_ORIGIN: Vector3Tuple = [0, 0, -8]
 
 type PlaygroundSceneProps = {
   invertMouseY?: boolean
@@ -28,10 +45,38 @@ export function PlaygroundScene({ invertMouseY = false }: PlaygroundSceneProps):
         <Physics gravity={[0, -9.81, 0]}>
           <PlayerController invertY={invertMouseY} />
           <FloatingCrate />
+          <NatureGrid />
           <Ground />
         </Physics>
       </Suspense>
     </Canvas>
+  )
+}
+
+function NatureGrid(): ReactElement {
+  const placements = useMemo(() => {
+    const rows = Math.ceil(NATURE_MODELS.length / GRID_COLUMNS)
+    const offsetX = -((GRID_COLUMNS - 1) * GRID_SPACING) / 2 + GRID_ORIGIN[0]
+    const offsetZ = -((rows - 1) * GRID_SPACING) / 2 + GRID_ORIGIN[2]
+
+    return NATURE_MODELS.map((Model, index) => {
+      const column = index % GRID_COLUMNS
+      const row = Math.floor(index / GRID_COLUMNS)
+      const position: Vector3Tuple = [
+        offsetX + column * GRID_SPACING,
+        GRID_ORIGIN[1],
+        offsetZ + row * GRID_SPACING,
+      ]
+      return { Model, position, key: `${Model.displayName ?? Model.name ?? 'NatureModel'}-${index}` }
+    })
+  }, [])
+
+  return (
+    <group>
+      {placements.map(({ Model, position, key }) => (
+        <Model key={key} position={position} />
+      ))}
+    </group>
   )
 }
 

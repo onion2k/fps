@@ -8,7 +8,7 @@ import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF('/Flower Petal-transformed.glb')
+  const { nodes, materials } = useGLTF('/flower-petal-transformed.glb')
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.Petal_2.geometry} material={materials.Flowers} />
@@ -16,4 +16,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/Flower Petal-transformed.glb')
+useGLTF.preload('/flower-petal-transformed.glb')

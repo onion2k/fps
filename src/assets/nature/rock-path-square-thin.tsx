@@ -8,7 +8,7 @@ import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF('/Rock Path Square Thin-transformed.glb')
+  const { nodes, materials } = useGLTF('/rock-path-square-thin-transformed.glb')
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.RockPath_Square_Thin.geometry} material={materials.PathRocks} />
@@ -16,4 +16,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/Rock Path Square Thin-transformed.glb')
+useGLTF.preload('/rock-path-square-thin-transformed.glb')

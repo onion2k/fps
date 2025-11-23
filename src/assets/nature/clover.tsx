@@ -8,7 +8,7 @@ import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF('/Clover-transformed.glb')
+  const { nodes, materials } = useGLTF('/clover-transformed.glb')
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.Clover_1.geometry} material={materials.Leaves} />
@@ -16,4 +16,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/Clover-transformed.glb')
+useGLTF.preload('/clover-transformed.glb')

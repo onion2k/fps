@@ -8,7 +8,7 @@ import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF('/Grass Wispy-transformed.glb')
+  const { nodes, materials } = useGLTF('/grass-wispy-transformed.glb')
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.Grass_Wispy_Tall.geometry} material={materials.Grass} />
@@ -16,4 +16,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/Grass Wispy-transformed.glb')
+useGLTF.preload('/grass-wispy-transformed.glb')
