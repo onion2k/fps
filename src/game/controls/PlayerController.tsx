@@ -9,6 +9,7 @@ import {
 import { useFrame, useThree } from '@react-three/fiber'
 import { CapsuleCollider, RigidBody, type RapierRigidBody } from '@react-three/rapier'
 import { Euler, Vector3, type Group, type Vector3Tuple } from 'three'
+import Rifle from '../../assets/rifle'
 
 type PlayerControllerProps = {
   invertY?: boolean
@@ -19,14 +20,14 @@ const LOOK_SENSITIVITY = 0.0035
 const CAMERA_HEIGHT = 1.3
 const MAX_PITCH = Math.PI / 2 - 0.05
 const JUMP_IMPULSE = 4.5
-const GUN_POSITION_OFFSET = new Vector3(0.32, -0.28, -0.75)
-const GUN_MUZZLE_OFFSET = new Vector3(0.06, -0.05, -0.45)
+const GUN_POSITION_OFFSET = new Vector3(0.2, -.35, -0.5)
+const GUN_MUZZLE_OFFSET = new Vector3(0, 0.17, -0.5)
 const GUN_SWAY_INTENSITY = 0.045
 const GUN_SWAY_SMOOTHING = 12
-const PROJECTILE_SPEED = 18
+const PROJECTILE_SPEED = 30
 const PROJECTILE_LIFETIME_MS = 2400
 const AUTO_FIRE_ENABLED = true
-const AUTO_FIRE_INTERVAL_MS = 150
+const AUTO_FIRE_INTERVAL_MS = 250
 
 const keyState: Record<'forward' | 'backward' | 'left' | 'right' | 'jump', boolean> = {
   forward: false,
@@ -277,10 +278,7 @@ export function PlayerController({ invertY = false }: PlayerControllerProps): Re
   return (
     <>
       <group ref={gunRef} frustumCulled={false}>
-        <mesh castShadow>
-          <boxGeometry args={[0.48, 0.22, 0.96]} />
-          <meshStandardMaterial color="#4b5563" metalness={0.15} roughness={0.45} />
-        </mesh>
+        <Rifle args={[]} />
       </group>
       <RigidBody
         ref={bodyRef}
@@ -357,7 +355,7 @@ function Projectile({ id, origin, direction, onExpire }: ProjectileProps): React
       ccd
     >
       <mesh castShadow>
-        <sphereGeometry args={[0.05, 10, 10]} />
+        <sphereGeometry args={[0.02, 10, 10]} />
         <meshStandardMaterial color="#fbbf24" emissive="#f59e0b" emissiveIntensity={0.6} />
       </mesh>
     </RigidBody>
