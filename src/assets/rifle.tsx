@@ -4,15 +4,32 @@ Command: npx gltfjsx@6.5.3 ../models/Assault Rifle.glb --transform -E -s -o ./sr
 Files: ../models/Assault Rifle.glb [133.98KB] > /Users/christopherneale/projects/fps/src/assets/Assault Rifle-transformed.glb [10.67KB] (92%)
 */
 
-import React from 'react'
 import { useGLTF } from '@react-three/drei'
-import type { MathProps, ReactProps, EventHandlers, InstanceProps } from '@react-three/fiber'
-import type { Mutable, Overwrite } from '@react-three/fiber/dist/declarations/src/core/utils'
-import type { JSX } from 'react/jsx-runtime'
-import type { Group, Object3DEventMap } from 'three'
+import type { ComponentPropsWithoutRef } from 'react'
+import type { GLTF } from 'three-stdlib'
+import type { Mesh, MeshStandardMaterial } from 'three'
 
-export default function Rifle(props: JSX.IntrinsicAttributes & Mutable<Overwrite<Partial<Overwrite<Group<Object3DEventMap>, MathProps<Group<Object3DEventMap>> & ReactProps<Group<Object3DEventMap>> & Partial<EventHandlers>>>, Omit<InstanceProps<Group<Object3DEventMap>, Group>, "object">>>) {
-  const { nodes, materials } = useGLTF('/AssaultRifle.glb')
+type RifleProps = ComponentPropsWithoutRef<'group'>
+
+type GLTFResult = GLTF & {
+  nodes: {
+    AssaultRifle2_1_1: Mesh
+    AssaultRifle2_1_2: Mesh
+    AssaultRifle2_1_3: Mesh
+  }
+  materials: {
+    Main: MeshStandardMaterial
+    MainDark: MeshStandardMaterial
+    MainLight: MeshStandardMaterial
+  }
+}
+
+/**
+ * Lightweight assault rifle mesh with baked materials for weapon pickups.
+ */
+export default function Rifle(props: RifleProps) {
+  const { nodes, materials } = useGLTF('/AssaultRifle.glb') as unknown as GLTFResult
+
   return (
     <group {...props} dispose={null}>
       <group rotation={[-Math.PI / 2, 0, Math.PI / 2]} scale={20}>

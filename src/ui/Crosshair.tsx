@@ -1,6 +1,5 @@
-import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo, useRef, type ReactElement } from 'react'
-import { Color, Vector3, type Group } from 'three'
+import { Color, type Group } from 'three'
 
 type CrosshairVariant = 'dot' | 'cross'
 
@@ -21,40 +20,46 @@ export type CrosshairProps = {
 export function Crosshair({
   variant = 'dot',
   color = '#ef4444',
-  distance = 0.6,
-  size = 0.0015,
+  size = 0.025,
 }: CrosshairProps): ReactElement {
-  const { camera } = useThree()
   const groupRef = useRef<Group | null>(null)
-  const forward = useMemo(() => new Vector3(0, 0, -1), [])
-  const targetPosition = useMemo(() => new Vector3(), [])
   const materialColor = useMemo(() => new Color(color), [color])
-
-  useFrame(() => {
-    const group = groupRef.current
-    if (!group) return
-    forward.set(0, 0, -1).applyQuaternion(camera.quaternion)
-    targetPosition.copy(camera.position).addScaledVector(forward, distance)
-    group.position.copy(targetPosition)
-    group.quaternion.copy(camera.quaternion)
-  })
+  const renderOrder = 10000
 
   return (
-    <group ref={groupRef} renderOrder={10}>
+    <group ref={groupRef} frustumCulled={false} renderOrder={renderOrder}>
       {variant === 'dot' ? (
-        <mesh>
+        <mesh frustumCulled={false} position={[0, 0, -5]} renderOrder={renderOrder}>
           <circleGeometry args={[size, 16]} />
-          <meshBasicMaterial color={materialColor} />
+          <meshBasicMaterial
+            color={materialColor}
+            depthTest={false}
+            depthWrite={false}
+            toneMapped={false}
+            transparent
+          />
         </mesh>
       ) : (
         <group>
-          <mesh position={[0, 0, 0]}>
+          <mesh position={[0, 0, 0]} frustumCulled={false} renderOrder={renderOrder}>
             <planeGeometry args={[size * 0.15, size * 2]} />
-            <meshBasicMaterial color={materialColor} />
+            <meshBasicMaterial
+              color={materialColor}
+              depthTest={false}
+              depthWrite={false}
+              toneMapped={false}
+              transparent
+            />
           </mesh>
-          <mesh position={[0, 0, 0]}>
+          <mesh position={[0, 0, 0]} frustumCulled={false} renderOrder={renderOrder}>
             <planeGeometry args={[size * 2, size * 0.15]} />
-            <meshBasicMaterial color={materialColor} />
+            <meshBasicMaterial
+              color={materialColor}
+              depthTest={false}
+              depthWrite={false}
+              toneMapped={false}
+              transparent
+            />
           </mesh>
         </group>
       )}

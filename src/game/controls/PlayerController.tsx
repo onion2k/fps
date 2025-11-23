@@ -21,7 +21,7 @@ const LOOK_SENSITIVITY = 0.0035
 const CAMERA_HEIGHT = 1.3
 const MAX_PITCH = Math.PI / 2 - 0.05
 const JUMP_IMPULSE = 4.5
-const GUN_POSITION_OFFSET = new Vector3(0.2, -.35, -0.5)
+const GUN_POSITION_OFFSET = new Vector3(0.1, -.25, -0.5)
 const GUN_MUZZLE_OFFSET = new Vector3(0, 0.13, -0.75)
 const GUN_SWAY_INTENSITY = 0.045
 const GUN_SWAY_SMOOTHING = 12
@@ -278,9 +278,9 @@ export function PlayerController({ invertY = false }: PlayerControllerProps): Re
 
   return (
     <>
-      <Crosshair />
       <group ref={gunRef} frustumCulled={false}>
         <Rifle args={[]} />
+        <Crosshair />
       </group>
       <RigidBody
         ref={bodyRef}

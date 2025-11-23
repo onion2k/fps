@@ -20,4 +20,11 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    files: ['scripts/**/*.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.node,
+    },
+  },
 ])
