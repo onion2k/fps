@@ -32,14 +32,16 @@ export function PlaygroundScene({ invertMouseY = false }: PlaygroundSceneProps):
   return (
     <Canvas shadows camera={{ position: [7, 6, 10], fov: 50 }}>
       <Stats />
-      <color attach="background" args={['#0b1021']} />
-      <fog attach="fog" args={['#0b1021', 16, 32]} />
+      <color attach="background" args={['#cfe8ff']} />
+      <fog attach="fog" args={['#cfe8ff', 32, 96]} />
       <Suspense fallback={null}>
-        <ambientLight intensity={0.45} />
+        <ambientLight intensity={0.7} color="#f8fbff" />
+        <hemisphereLight args={['#f0f8ff', '#d6eabf', 0.6]} />
         <directionalLight
           castShadow
-          intensity={1.1}
-          position={[8, 12, 6]}
+          intensity={1.35}
+          color="#ffe7c7"
+          position={[10, 14, 6]}
           shadow-mapSize={[1024, 1024]}
         />
         <Physics gravity={[0, -9.81, 0]}>
@@ -102,7 +104,7 @@ function Ground(): ReactElement {
     <RigidBody type="fixed" friction={1.2} restitution={0.05}>
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[48, 48, 16, 16]} />
-        <meshStandardMaterial color="#111827" />
+        <meshStandardMaterial color="#c9e7b2" />
       </mesh>
     </RigidBody>
   )
