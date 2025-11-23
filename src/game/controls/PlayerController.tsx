@@ -10,6 +10,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { CapsuleCollider, RigidBody, type RapierRigidBody } from '@react-three/rapier'
 import { Euler, Vector3, type Group, type Vector3Tuple } from 'three'
 import Rifle from '../../assets/rifle'
+import { Crosshair } from '../../ui/Crosshair.tsx'
 
 type PlayerControllerProps = {
   invertY?: boolean
@@ -277,6 +278,7 @@ export function PlayerController({ invertY = false }: PlayerControllerProps): Re
 
   return (
     <>
+      <Crosshair />
       <group ref={gunRef} frustumCulled={false}>
         <Rifle args={[]} />
       </group>

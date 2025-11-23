@@ -1,6 +1,7 @@
 import { Suspense, type ReactElement } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Physics, RigidBody } from '@react-three/rapier'
+import { Stats } from '@react-three/drei'
 import { PlayerController } from '../controls/PlayerController.tsx'
 
 type PlaygroundSceneProps = {
@@ -13,6 +14,7 @@ type PlaygroundSceneProps = {
 export function PlaygroundScene({ invertMouseY = false }: PlaygroundSceneProps): ReactElement {
   return (
     <Canvas shadows camera={{ position: [7, 6, 10], fov: 50 }}>
+      <Stats />
       <color attach="background" args={['#0b1021']} />
       <fog attach="fog" args={['#0b1021', 16, 32]} />
       <Suspense fallback={null}>
