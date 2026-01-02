@@ -1,9 +1,9 @@
-import { Suspense, useMemo, type ComponentType, type ReactElement } from 'react'
+import { Suspense, type ComponentType, type ReactElement } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Physics, RigidBody } from '@react-three/rapier'
 import { Stats } from '@react-three/drei'
 import { PlayerController } from '../controls/PlayerController.tsx'
-import type { Vector3Tuple } from 'three'
+import { SceneryCluster } from './SceneryCluster.tsx'
 
 type NatureModelProps = JSX.IntrinsicElements['group']
 
@@ -13,13 +13,19 @@ type NatureModule = {
 
 const natureModules = import.meta.glob<NatureModule>('../../assets/nature/*', { eager: true })
 
-const NATURE_MODELS: ComponentType<NatureModelProps>[] = Object.values(natureModules)
-  .map((module) => module.Model)
-  .filter((Model): Model is ComponentType<NatureModelProps> => typeof Model === 'function')
+const NATURE_MODELS = Object.entries(natureModules).reduce(
+  (models, [path, module]) => {
+    if (typeof module.Model !== 'function') {
+      return models
+    }
 
-const GRID_COLUMNS = 8
-const GRID_SPACING = 4
-const GRID_ORIGIN: Vector3Tuple = [0, 0, -8]
+    const fileName = path.split('/').pop() ?? path
+    const modelName = fileName.replace(/\.[^/.]+$/, '')
+    models[modelName] = module.Model
+    return models
+  },
+  {} as Record<string, ComponentType<NatureModelProps>>,
+)
 
 type PlaygroundSceneProps = {
   invertMouseY?: boolean
@@ -29,6 +35,11 @@ type PlaygroundSceneProps = {
  * Simple placeholder scene to verify React Three Fiber and Rapier are wired up.
  */
 export function PlaygroundScene({ invertMouseY = false }: PlaygroundSceneProps): ReactElement {
+  const bushModel = NATURE_MODELS['bush']
+  const pineModel = NATURE_MODELS['pine']
+  const treeModel = NATURE_MODELS['tree']
+  const rockModel = NATURE_MODELS['rock-medium']
+
   return (
     <Canvas shadows camera={{ position: [7, 6, 10], fov: 50 }}>
       <Stats />
@@ -43,42 +54,32 @@ export function PlaygroundScene({ invertMouseY = false }: PlaygroundSceneProps):
           color="#ffe7c7"
           position={[10, 14, 6]}
           shadow-mapSize={[1024, 1024]}
+          shadow-camera-left={-40}
+          shadow-camera-right={40}
+          shadow-camera-top={40}
+          shadow-camera-bottom={-40}
+          shadow-camera-near={1}
+          shadow-camera-far={80}
         />
         <Physics gravity={[0, -9.81, 0]}>
           <PlayerController invertY={invertMouseY} />
           <FloatingCrate />
-          <NatureGrid />
+          {bushModel ? (
+            <SceneryCluster component={bushModel} center={[0, -20]} count={20} radius={5} />
+          ) : null}
+          {pineModel ? (
+            <SceneryCluster component={pineModel} center={[10, -20]} count={20} radius={5} />
+          ) : null}
+          {treeModel ? (
+            <SceneryCluster component={treeModel} center={[-10, -20]} count={20} radius={5} />
+          ) : null}
+          {rockModel ? (
+            <SceneryCluster component={rockModel} center={[5, 0]} count={3} radius={10} />
+          ) : null}
           <Ground />
         </Physics>
       </Suspense>
     </Canvas>
-  )
-}
-
-function NatureGrid(): ReactElement {
-  const placements = useMemo(() => {
-    const rows = Math.ceil(NATURE_MODELS.length / GRID_COLUMNS)
-    const offsetX = -((GRID_COLUMNS - 1) * GRID_SPACING) / 2 + GRID_ORIGIN[0]
-    const offsetZ = -((rows - 1) * GRID_SPACING) / 2 + GRID_ORIGIN[2]
-
-    return NATURE_MODELS.map((Model, index) => {
-      const column = index % GRID_COLUMNS
-      const row = Math.floor(index / GRID_COLUMNS)
-      const position: Vector3Tuple = [
-        offsetX + column * GRID_SPACING,
-        GRID_ORIGIN[1],
-        offsetZ + row * GRID_SPACING,
-      ]
-      return { Model, position, key: `${Model.displayName ?? Model.name ?? 'NatureModel'}-${index}` }
-    })
-  }, [])
-
-  return (
-    <group>
-      {placements.map(({ Model, position, key }) => (
-        <Model key={key} position={position} />
-      ))}
-    </group>
   )
 }
 
@@ -102,7 +103,7 @@ function FloatingCrate(): ReactElement {
 function Ground(): ReactElement {
   return (
     <RigidBody type="fixed" friction={1.2} restitution={0.05}>
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} userData={{ isGround: true }}>
         <planeGeometry args={[48, 48, 16, 16]} />
         <meshStandardMaterial color="#c9e7b2" />
       </mesh>
