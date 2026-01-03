@@ -4,11 +4,20 @@ Command: npx gltfjsx@6.5.3 /Users/christopherneale/projects/models/nature/Pine.g
 Files: /Users/christopherneale/projects/models/nature/Pine.glb [2.15MB] > /Users/christopherneale/projects/fps/src/assets/nature/Pine-transformed.glb [132.09KB] (94%)
 */
 
-import React from 'react'
 import { useGLTF } from '@react-three/drei'
+import type { ComponentPropsWithoutRef } from 'react'
+import type { GLTF } from 'three-stdlib'
+import type { Material, Mesh } from 'three'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/pine-transformed.glb')
+type ModelProps = ComponentPropsWithoutRef<'group'>
+
+type GLTFResult = GLTF & {
+  nodes: Record<string, Mesh>
+  materials: Record<string, Material>
+}
+
+export function Model(props: ModelProps) {
+  const { nodes, materials } = useGLTF('/pine-transformed.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.Pine_5_1.geometry} material={materials.Bark_NormalTree} />

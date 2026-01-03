@@ -4,11 +4,20 @@ Command: npx gltfjsx@6.5.3 /Users/christopherneale/projects/models/nature/Rock P
 Files: /Users/christopherneale/projects/models/nature/Rock Path Round Thin.glb [961.04KB] > /Users/christopherneale/projects/fps/src/assets/nature/Rock Path Round Thin-transformed.glb [63.06KB] (93%)
 */
 
-import React from 'react'
 import { useGLTF } from '@react-three/drei'
+import type { ComponentPropsWithoutRef } from 'react'
+import type { GLTF } from 'three-stdlib'
+import type { Material, Mesh } from 'three'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/rock-path-round-thin-transformed.glb')
+type ModelProps = ComponentPropsWithoutRef<'group'>
+
+type GLTFResult = GLTF & {
+  nodes: Record<string, Mesh>
+  materials: Record<string, Material>
+}
+
+export function Model(props: ModelProps) {
+  const { nodes, materials } = useGLTF('/rock-path-round-thin-transformed.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.RockPath_Round_Thin.geometry} material={materials.PathRocks} />

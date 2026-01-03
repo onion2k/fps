@@ -4,11 +4,20 @@ Command: npx gltfjsx@6.5.3 /Users/christopherneale/projects/models/nature/Bush w
 Files: /Users/christopherneale/projects/models/nature/Bush with Flowers.glb [809.73KB] > /Users/christopherneale/projects/fps/src/assets/nature/Bush with Flowers-transformed.glb [176.41KB] (78%)
 */
 
-import React from 'react'
 import { useGLTF } from '@react-three/drei'
+import type { ComponentPropsWithoutRef } from 'react'
+import type { GLTF } from 'three-stdlib'
+import type { Material, Mesh } from 'three'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/bush-with-flowers-transformed.glb')
+type ModelProps = ComponentPropsWithoutRef<'group'>
+
+type GLTFResult = GLTF & {
+  nodes: Record<string, Mesh>
+  materials: Record<string, Material>
+}
+
+export function Model(props: ModelProps) {
+  const { nodes, materials } = useGLTF('/bush-with-flowers-transformed.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.Bush_Common_Flowers_1.geometry} material={materials.Leaves_NormalTree} />

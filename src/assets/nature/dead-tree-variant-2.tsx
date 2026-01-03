@@ -4,11 +4,20 @@ Command: npx gltfjsx@6.5.3 /Users/christopherneale/projects/models/nature/Dead T
 Files: /Users/christopherneale/projects/models/nature/Dead Tree-Mcd2zYqyww.glb [2.62MB] > /Users/christopherneale/projects/fps/src/assets/nature/Dead Tree-Mcd2zYqyww-transformed.glb [161.32KB] (94%)
 */
 
-import React from 'react'
 import { useGLTF } from '@react-three/drei'
+import type { ComponentPropsWithoutRef } from 'react'
+import type { GLTF } from 'three-stdlib'
+import type { Material, Mesh } from 'three'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/dead-tree-variant-2-transformed.glb')
+type ModelProps = ComponentPropsWithoutRef<'group'>
+
+type GLTFResult = GLTF & {
+  nodes: Record<string, Mesh>
+  materials: Record<string, Material>
+}
+
+export function Model(props: ModelProps) {
+  const { nodes, materials } = useGLTF('/dead-tree-variant-2-transformed.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.DeadTree_2.geometry} material={materials.Bark_DeadTree} />

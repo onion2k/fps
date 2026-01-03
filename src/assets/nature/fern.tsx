@@ -4,11 +4,20 @@ Command: npx gltfjsx@6.5.3 /Users/christopherneale/projects/models/nature/Fern.g
 Files: /Users/christopherneale/projects/models/nature/Fern.glb [692.72KB] > /Users/christopherneale/projects/fps/src/assets/nature/Fern-transformed.glb [80.83KB] (88%)
 */
 
-import React from 'react'
 import { useGLTF } from '@react-three/drei'
+import type { ComponentPropsWithoutRef } from 'react'
+import type { GLTF } from 'three-stdlib'
+import type { Material, Mesh } from 'three'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/fern-transformed.glb')
+type ModelProps = ComponentPropsWithoutRef<'group'>
+
+type GLTFResult = GLTF & {
+  nodes: Record<string, Mesh>
+  materials: Record<string, Material>
+}
+
+export function Model(props: ModelProps) {
+  const { nodes, materials } = useGLTF('/fern-transformed.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.Fern_1.geometry} material={materials.Leaves} />

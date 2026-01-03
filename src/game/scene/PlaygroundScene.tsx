@@ -1,11 +1,12 @@
 import { Suspense, type ComponentType, type ReactElement } from 'react'
+import type { ComponentPropsWithoutRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Physics, RigidBody } from '@react-three/rapier'
 import { Stats } from '@react-three/drei'
 import { PlayerController } from '../controls/PlayerController.tsx'
 import { SceneryCluster } from './SceneryCluster.tsx'
 
-type NatureModelProps = JSX.IntrinsicElements['group']
+type NatureModelProps = ComponentPropsWithoutRef<'group'>
 
 type NatureModule = {
   Model?: ComponentType<NatureModelProps>

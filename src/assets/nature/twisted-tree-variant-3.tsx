@@ -4,11 +4,20 @@ Command: npx gltfjsx@6.5.3 /Users/christopherneale/projects/models/nature/Twiste
 Files: /Users/christopherneale/projects/models/nature/Twisted Tree-9aWlx82xUf.glb [3.05MB] > /Users/christopherneale/projects/fps/src/assets/nature/Twisted Tree-9aWlx82xUf-transformed.glb [247.41KB] (92%)
 */
 
-import React from 'react'
 import { useGLTF } from '@react-three/drei'
+import type { ComponentPropsWithoutRef } from 'react'
+import type { GLTF } from 'three-stdlib'
+import type { Material, Mesh } from 'three'
 
-export function Model(props) {
-  const { nodes, materials } = useGLTF('/twisted-tree-variant-3-transformed.glb')
+type ModelProps = ComponentPropsWithoutRef<'group'>
+
+type GLTFResult = GLTF & {
+  nodes: Record<string, Mesh>
+  materials: Record<string, Material>
+}
+
+export function Model(props: ModelProps) {
+  const { nodes, materials } = useGLTF('/twisted-tree-variant-3-transformed.glb') as unknown as GLTFResult
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.TwistedTree_1_1.geometry} material={materials.Bark_TwistedTree} />

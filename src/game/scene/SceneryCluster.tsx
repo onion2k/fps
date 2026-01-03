@@ -1,6 +1,15 @@
-import { useLayoutEffect, useMemo, useRef, type ComponentType, type ReactElement } from 'react'
-import { useThree } from '@react-three/fiber'
 import {
+  useCallback,
+  useMemo,
+  useState,
+  type ComponentPropsWithoutRef,
+  type ComponentType,
+  type ReactElement,
+} from 'react'
+import { useThree } from '@react-three/fiber'
+import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import {
+  Box3,
   Raycaster,
   Vector3,
   type Group,
@@ -10,7 +19,7 @@ import {
   type Vector3Tuple,
 } from 'three'
 
-type SceneryComponentProps = JSX.IntrinsicElements['group']
+type SceneryComponentProps = ComponentPropsWithoutRef<'group'>
 
 export type SceneryClusterProps = {
   component: ComponentType<SceneryComponentProps>
@@ -135,26 +144,60 @@ function SceneryInstance({
   castShadow,
   receiveShadow,
 }: SceneryInstanceProps): ReactElement {
-  const groupRef = useRef<Group>(null)
+  const [collider, setCollider] = useState<{
+    halfExtents: Vector3Tuple
+    center: Vector3Tuple
+  } | null>(null)
 
-  useLayoutEffect(() => {
-    const root = groupRef.current
-    if (!root) {
-      return
-    }
-
-    root.traverse((child) => {
-      if ('isMesh' in child && (child as Mesh).isMesh) {
-        const mesh = child as Mesh
-        mesh.castShadow = castShadow
-        mesh.receiveShadow = receiveShadow
+  const handleGroupRef = useCallback(
+    (root: Group | null) => {
+      if (!root) {
+        return
       }
-    })
-  }, [castShadow, receiveShadow])
+
+      root.updateWorldMatrix(true, true)
+      const bounds = new Box3()
+      const inverseRootMatrix = root.matrixWorld.clone().invert()
+
+      root.traverse((child) => {
+        if ('isMesh' in child && (child as Mesh).isMesh) {
+          const mesh = child as Mesh
+          mesh.castShadow = castShadow
+          mesh.receiveShadow = receiveShadow
+          if (!mesh.geometry.boundingBox) {
+            mesh.geometry.computeBoundingBox()
+          }
+          const geometryBounds = mesh.geometry.boundingBox
+          if (!geometryBounds) {
+            return
+          }
+          const worldBounds = geometryBounds.clone().applyMatrix4(mesh.matrixWorld)
+          bounds.union(worldBounds.applyMatrix4(inverseRootMatrix))
+        }
+      })
+
+      if (!bounds.isEmpty()) {
+        const size = new Vector3()
+        const center = new Vector3()
+        bounds.getSize(size)
+        bounds.getCenter(center)
+        setCollider({
+          halfExtents: [size.x / 2, size.y / 2, size.z / 2],
+          center: [center.x, center.y, center.z],
+        })
+      }
+    },
+    [castShadow, receiveShadow],
+  )
 
   return (
-    <group ref={groupRef}>
-      <SceneryComponent position={position} rotation={rotation} />
-    </group>
+    <RigidBody type="fixed" colliders={false} position={position} rotation={rotation}>
+      <group ref={handleGroupRef}>
+        <SceneryComponent />
+      </group>
+      {collider ? (
+        <CuboidCollider args={collider.halfExtents} position={collider.center} />
+      ) : null}
+    </RigidBody>
   )
 }
